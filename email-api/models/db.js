@@ -5,7 +5,7 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false } // required for Railway PostgreSQL
 });
 
-// Create emails table if it doesn't exist
+// Create emails table and sent_emails table if they don't exist
 const initDB = async () => {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS emails (
@@ -18,6 +18,17 @@ const initDB = async () => {
       created_at  TIMESTAMPTZ DEFAULT NOW()
     )
   `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS sent_emails (
+      id         SERIAL PRIMARY KEY,
+      "to"       TEXT NOT NULL,
+      subject    TEXT DEFAULT '(No Subject)',
+      body       TEXT DEFAULT '',
+      sent_at    TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+
   console.log('Database ready.');
 };
 
