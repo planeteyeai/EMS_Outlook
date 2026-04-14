@@ -7,7 +7,6 @@ const auth       = require('../middleware/auth');
 // Called by Power Automate when a new email arrives
 router.post('/webhook/new-email', async (req, res) => {
   const secret = req.query.secret || req.headers['x-secret'];
-
   if (!secret || secret !== process.env.WEBHOOK_SECRET) {
     return res.status(401).json({ error: 'Unauthorized webhook call.' });
   }

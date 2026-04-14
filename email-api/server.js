@@ -3,6 +3,7 @@ const express      = require('express');
 const cors         = require('cors');
 const { initDB }   = require('./models/db');
 const emailRoutes  = require('./routes/emails');
+const sendRoutes   = require('./routes/send');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -15,6 +16,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api', emailRoutes);
+app.use('/api', sendRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found.' });
