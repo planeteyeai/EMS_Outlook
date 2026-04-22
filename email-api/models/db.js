@@ -14,6 +14,7 @@ const initDB = async () => {
       "from"      TEXT NOT NULL,
       "to"        TEXT DEFAULT '',
       body        TEXT DEFAULT '',
+      is_read     BOOLEAN DEFAULT FALSE,
       received_at TIMESTAMPTZ DEFAULT NOW(),
       created_at  TIMESTAMPTZ DEFAULT NOW()
     )
@@ -29,6 +30,9 @@ const initDB = async () => {
       sent_at    TIMESTAMPTZ DEFAULT NOW()
     )
   `);
+
+  // Add is_read column if it doesn't exist (migration)
+  await pool.query(`ALTER TABLE emails ADD COLUMN IF NOT EXISTS is_read BOOLEAN DEFAULT FALSE`);
 
   console.log('Database ready.');
 };
