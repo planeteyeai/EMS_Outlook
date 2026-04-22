@@ -8,19 +8,31 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 // POST /api/send-email
 router.post('/send-email', auth, async (req, res) => {
-  const { to, subject, body } = req.body;
+  const { to, subject, body, attachments } = req.body;
 
   if (!to || !subject || !body) {
     return res.status(400).json({ error: 'to, subject and body are required.' });
   }
 
   try {
-    await sgMail.send({
+    const msg = {
       to,
       from: process.env.SENDGRID_FROM_EMAIL,
       subject,
       text: body
-    });
+    };
+
+    // attachments format: [{ filename: 'file.pdf', content: 'base64string', type: 'application/pdf' }]
+    if (attachments && attachments.length > 0) {
+      msg.attachments = attachments.map(att => ({
+        filename:    att.filename,
+        content:     att.content,   // base64 encoded file content
+        type:        att.type,      // mime type e.g. image/png, application/pdf
+        disposition: 'attachment'
+      }));
+    }
+
+    await sgMail.send(msg);
 
     // Save to sent_emails table
     await pool.query(
