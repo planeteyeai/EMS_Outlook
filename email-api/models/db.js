@@ -2,11 +2,11 @@ const { Pool } = require('pg');
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false } // required for Railway PostgreSQL
+  ssl: { rejectUnauthorized: false }
 });
 
-// Create emails table and sent_emails table if they don't exist
 const initDB = async () => {
+  // Inbox emails table
   await pool.query(`
     CREATE TABLE IF NOT EXISTS emails (
       id          SERIAL PRIMARY KEY,
@@ -19,6 +19,7 @@ const initDB = async () => {
     )
   `);
 
+  // Sent emails table
   await pool.query(`
     CREATE TABLE IF NOT EXISTS sent_emails (
       id         SERIAL PRIMARY KEY,
