@@ -15,10 +15,13 @@ router.post('/webhook/new-email', async (req, res) => {
     const { subject, from, to, body, receivedAt } = req.body;
     if (!from) return res.status(400).json({ error: '"from" field is required.' });
 
+    // Strip HTML tags from body to save plain text only
+    const plainBody = body ? body.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() : '';
+
     const result = await pool.query(
       `INSERT INTO emails (subject, "from", "to", body, received_at)
        VALUES ($1, $2, $3, $4, $5) RETURNING id`,
-      [subject || '(No Subject)', from, to || '', body || '', receivedAt ? new Date(receivedAt) : new Date()]
+      [subject || '(No Subject)', from, to || '', plainBody, receivedAt ? new Date(receivedAt) : new Date()]
     );
 
     return res.status(201).json({ success: true, id: result.rows[0].id });
