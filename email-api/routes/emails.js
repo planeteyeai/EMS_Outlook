@@ -49,6 +49,16 @@ router.get('/emails', auth, async (req, res) => {
   }
 });
 
+// GET /api/emails/unread/count — get unread count
+router.get('/emails/unread/count', auth, async (req, res) => {
+  try {
+    const result = await pool.query(`SELECT COUNT(*) FROM emails WHERE is_read = FALSE`);
+    return res.json({ unread: parseInt(result.rows[0].count) });
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to get unread count.' });
+  }
+});
+
 // GET /api/emails/:id
 router.get('/emails/:id', auth, async (req, res) => {
   try {
@@ -77,16 +87,6 @@ router.patch('/emails/:id/read', auth, async (req, res) => {
     return res.json({ success: true });
   } catch (err) {
     return res.status(500).json({ error: 'Failed to mark as read.' });
-  }
-});
-
-// GET /api/emails/unread/count — get unread count
-router.get('/emails/unread/count', auth, async (req, res) => {
-  try {
-    const result = await pool.query(`SELECT COUNT(*) FROM emails WHERE is_read = FALSE`);
-    return res.json({ unread: parseInt(result.rows[0].count) });
-  } catch (err) {
-    return res.status(500).json({ error: 'Failed to get unread count.' });
   }
 });
 
