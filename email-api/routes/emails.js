@@ -50,7 +50,7 @@ router.get('/emails', auth, async (req, res) => {
 });
 
 // GET /api/emails/unread/count — get unread count
-router.get('/emails/unread/count', auth, async (req, res) => {
+router.get('/emails/unread/count', async (req, res) => {
   try {
     const result = await pool.query(`SELECT COUNT(*) FROM emails WHERE is_read = FALSE`);
     return res.json({ unread: parseInt(result.rows[0].count) });
@@ -81,7 +81,7 @@ router.delete('/emails/:id', auth, async (req, res) => {
 });
 
 // PATCH /api/emails/:id/read — mark email as read
-router.patch('/emails/:id/read', auth, async (req, res) => {
+router.patch('/emails/:id/read', async (req, res) => {
   try {
     await pool.query(`UPDATE emails SET is_read = TRUE WHERE id = $1`, [req.params.id]);
     return res.json({ success: true });
