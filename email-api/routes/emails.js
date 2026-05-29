@@ -49,7 +49,7 @@ router.get('/emails', auth, async (req, res) => {
   }
 });
 
-// GET /api/emails/unread/count — get unread count
+// GET /api/emails/unread/count — must be before /:id to avoid param conflict
 router.get('/emails/unread/count', async (req, res) => {
   try {
     const result = await pool.query(`SELECT COUNT(*) FROM emails WHERE is_read = FALSE`);
