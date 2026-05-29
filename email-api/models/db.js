@@ -1,8 +1,24 @@
 const { Pool } = require('pg');
 
+const dbUrl = process.env.DATABASE_URL;
+if (!dbUrl) {
+  console.error('FATAL: DATABASE_URL environment variable is not set.');
+  process.exit(1);
+}
+
+// Log the host portion only (never log credentials)
+try {
+  const { hostname, port, pathname } = new URL(dbUrl);
+  console.log(`DB config → host: ${hostname}, port: ${port}, db: ${pathname}`);
+} catch {
+  console.error('FATAL: DATABASE_URL is not a valid URL.');
+  process.exit(1);
+}
+
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
+  connectionString: dbUrl,
+  ssl: { rejectUnauthorized: false },
+  connectionTimeoutMillis: 10000,
 });
 
 const initDB = async () => {
