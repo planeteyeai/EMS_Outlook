@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express     = require('express');
 const cors        = require('cors');
-const { initDBWithRetry }  = require('./models/db');
+const { initDB }  = require('./models/db');
 const authRoutes  = require('./routes/auth');
 const emailRoutes = require('./routes/emails');
 const sendRoutes  = require('./routes/send');
@@ -24,8 +24,6 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Route not found.' });
 });
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-initDBWithRetry()
-  .then(() => console.log('DB ready.'))
-  .catch(err => { console.error('DB init failed after retries:', err.message); process.exit(1); });
+initDB()
+  .then(() => app.listen(PORT, () => console.log(`Server running on port ${PORT}`)))
+  .catch(err => { console.error('DB init failed:', err.message); process.exit(1); });
