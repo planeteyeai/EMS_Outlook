@@ -37,4 +37,17 @@ const initDB = async () => {
   console.log('Database ready.');
 };
 
-module.exports = { pool, initDB };
+const initDBWithRetry = async (retries = 10, delayMs = 3000) => {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      await initDB();
+      return;
+    } catch (err) {
+      console.error(`DB init attempt ${attempt}/${retries} failed: ${err.message}`);
+      if (attempt === retries) throw err;
+      await new Promise(res => setTimeout(res, delayMs));
+    }
+  }
+};
+
+module.exports = { pool, initDB, initDBWithRetry };
