@@ -1,24 +1,8 @@
 const { Pool } = require('pg');
 
-const dbUrl = process.env.DATABASE_URL;
-if (!dbUrl) {
-  console.error('FATAL: DATABASE_URL environment variable is not set.');
-  process.exit(1);
-}
-
-// Log the host portion only (never log credentials)
-try {
-  const { hostname, port, pathname } = new URL(dbUrl);
-  console.log(`DB config → host: ${hostname}, port: ${port}, db: ${pathname}`);
-} catch {
-  console.error('FATAL: DATABASE_URL is not a valid URL.');
-  process.exit(1);
-}
-
 const pool = new Pool({
-  connectionString: dbUrl,
-  ssl: { rejectUnauthorized: false },
-  connectionTimeoutMillis: 10000,
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
 });
 
 const initDB = async () => {
@@ -53,17 +37,4 @@ const initDB = async () => {
   console.log('Database ready.');
 };
 
-const initDBWithRetry = async (retries = 10, delayMs = 3000) => {
-  for (let attempt = 1; attempt <= retries; attempt++) {
-    try {
-      await initDB();
-      return;
-    } catch (err) {
-      console.error(`DB init attempt ${attempt}/${retries} failed: ${err.message}`);
-      if (attempt === retries) throw err;
-      await new Promise(res => setTimeout(res, delayMs));
-    }
-  }
-};
-
-module.exports = { pool, initDB, initDBWithRetry };
+module.exports = { pool, initDB };
